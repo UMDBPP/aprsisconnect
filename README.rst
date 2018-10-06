@@ -48,7 +48,7 @@ Example 1 Code
     a = aprs.TCPConnection('W2GMD', '12345')
     a.connect()
 
-    a.receive(callback=p)
+    a.start_receiving(callback=p)
 
 Example 1 Output
 ^^^^^^^^^^^^^^^^

@@ -242,6 +242,7 @@ class APRSISConnection(object):
         self._full_auth = None
         self.interface = None
         self.use_i_construct = False
+        self._receiving = False
 
     def connect(self):
         """
@@ -261,12 +262,14 @@ class APRSISConnection(object):
         """
         pass
 
-    def receive(self, callback=None, frame_handler=aprsisconnect.parse_frame):
+    def start_receiving(self, callback=None, frame_handler=aprsisconnect.parse_frame):
         """
         Abstract method for receiving messages from APRS-IS.
         """
         pass
 
+    def stop_receiving(self):
+        pass
 
 class TCPConnection(APRSISConnection):
 
@@ -286,6 +289,7 @@ class TCPConnection(APRSISConnection):
         self.servers = itertools.cycle(servers)
         self.use_i_construct = True
         self._connected = False
+        self._address_info = None
 
     def connect(self):
         """
@@ -301,15 +305,15 @@ class TCPConnection(APRSISConnection):
                 port = aprsisconnect.APRSIS_FILTER_PORT
 
             try:
-                addr_info = socket.getaddrinfo(server, port)
+                self._address_info = socket.getaddrinfo(server, port)
 
-                self.interface = socket.socket(*addr_info[0][0:3])
+                self.interface = socket.socket(*self._address_info[0][0:3])
 
                 # Connect
                 self._logger.info(
-                    "Connect To %s:%i", addr_info[0][4][0], port)
+                    "Connect To %s:%i", self._address_info[0][4][0], port)
 
-                self.interface.connect(addr_info[0][4])
+                self.interface.connect(self._address_info[0][4])
 
                 server_hello = self.interface.recv(1024)
 
@@ -318,7 +322,7 @@ class TCPConnection(APRSISConnection):
 
                 # Auth
                 self._logger.info(
-                    "Auth To %s:%i", addr_info[0][4][0], port)
+                    "Auth To %s:%i", self._address_info[0][4][0], port)
 
                 _full_auth = self._full_auth + b'\n\r'
 
@@ -331,10 +335,28 @@ class TCPConnection(APRSISConnection):
                 self._connected = True
             except socket.error as ex:
                 self._logger.exception(ex)
-                self._logger.warn(
+                self._logger.warning(
                     "Error when connecting to %s:%d: '%s'",
                     server, port, str(ex))
                 time.sleep(1)
+
+
+    def disconnect(self):
+        try:
+            self.stop_receiving()
+            self.interface.shutdown(socket.SHUT_RDWR)  # Shuts down the socket immediately
+            self.interface.close()  # Frees socket's resources
+            self._connected = False
+            self._logger.info("Disconnected from %s:%i",
+                              self._address_info[0][4][0],  # IP address
+                              self._address_info[0][4][1])  # Port
+            self._address_info = None
+
+        except socket.error as ex:
+            self._logger.exception(ex)
+            self._logger.warning(
+                "Error when trying to disconnect from server")
+
 
     def send(self, frame):
         """
@@ -350,7 +372,7 @@ class TCPConnection(APRSISConnection):
 
         return self.interface.send(_frame)
 
-    def receive(self, callback=None, frame_handler=aprsisconnect.parse_frame):
+    def start_receiving(self, callback=None, frame_handler=aprsisconnect.parse_frame):
         """
         Receives from APRS-IS.
 
@@ -367,8 +389,10 @@ class TCPConnection(APRSISConnection):
         # Unicode Sandwich: Receive Bytes.
         recvd_data = bytes()
 
+        self._receiving = True
+
         try:
-            while 1:
+            while self._connected and self._receiving:
                 recv_data = self.interface.recv(aprsisconnect.RECV_BUFFER)
 
                 if not recv_data:
@@ -406,6 +430,9 @@ class TCPConnection(APRSISConnection):
         except socket.error as sock_err:
             self._logger.exception(sock_err)
             raise
+
+    def stop_receiving(self):
+        self._receiving = False
 
 
 class UDPConnection(APRSISConnection):
