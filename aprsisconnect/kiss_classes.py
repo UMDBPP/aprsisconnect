@@ -7,7 +7,7 @@ import logging
 
 import kiss  # pylint: disable=R0801
 
-import aprs  # pylint: disable=R0801
+import aprsisconnect  # pylint: disable=R0801
 
 __author__ = 'Greg Albrecht W2GMD <oss@undef.net>'  # NOQA pylint: disable=R0801
 __copyright__ = 'Copyright 2017 Greg Albrecht and Contributors'  # NOQA pylint: disable=R0801
@@ -27,10 +27,10 @@ class Frame(object):
 
     _logger = logging.getLogger(__name__)  # pylint: disable=R0801
     if not _logger.handlers:  # pylint: disable=R0801
-        _logger.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
+        _logger.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
         _console_handler = logging.StreamHandler()  # pylint: disable=R0801
-        _console_handler.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
-        _console_handler.setFormatter(aprs.LOG_FORMAT)  # pylint: disable=R0801
+        _console_handler.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
+        _console_handler.setFormatter(aprsisconnect.LOG_FORMAT)  # pylint: disable=R0801
         _logger.addHandler(_console_handler)  # pylint: disable=R0801
         _logger.propagate = False  # pylint: disable=R0801
 
@@ -88,19 +88,19 @@ class Frame(object):
 
         for char in self.frame:
             if '>' in char and not self.source:
-                self.source = aprs.Callsign(frame_so_far)
+                self.source = aprsisconnect.Callsign(frame_so_far)
                 frame_so_far = ''
             elif ':' in char:
                 if not self.path:
                     if ',' in frame_so_far:
-                        self.destination = aprs.Callsign(
+                        self.destination = aprsisconnect.Callsign(
                             frame_so_far.split(',')[0])
                         self.path = []
                         for path in frame_so_far.split(',')[1:]:
-                            self.path.append(aprs.Callsign(path))
+                            self.path.append(aprsisconnect.Callsign(path))
                         frame_so_far = ''
                     elif not self.destination:
-                        self.destination = aprs.Callsign(frame_so_far)
+                        self.destination = aprsisconnect.Callsign(frame_so_far)
                         frame_so_far = ''
                     else:
                         frame_so_far = ''.join([frame_so_far, char])
@@ -169,20 +169,20 @@ class Frame(object):
         """
         Extracts a Source Callsign of a KISS-Encoded Frame.
         """
-        self.source = aprs.Callsign(self.frame[7:])
+        self.source = aprsisconnect.Callsign(self.frame[7:])
 
     def _extract_kiss_destination(self):
         """
         Extracts a Destination Callsign of a KISS-Encoded Frame.
         """
-        self.destination = aprs.Callsign(self.frame)
+        self.destination = aprsisconnect.Callsign(self.frame)
 
     def _extract_kiss_path(self, start):
         """
         Extracts path from raw APRS KISS frame.
         """
         for i in range(2, start):
-            path_call = aprs.Callsign(self.frame[i * 7:])
+            path_call = aprsisconnect.Callsign(self.frame[i * 7:])
 
             if path_call:
                 if ord(self.frame[i * 7 + 6]) & 0x80:

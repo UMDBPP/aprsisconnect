@@ -7,7 +7,7 @@ import unittest  # pylint: disable=R0801
 
 import httpretty
 
-from .context import aprs  # pylint: disable=R0801
+from .context import aprsisconnect  # pylint: disable=R0801
 from .context import aprs_test_classes  # pylint: disable=R0801
 
 from . import constants  # pylint: disable=R0801
@@ -32,13 +32,13 @@ class APRSTest(aprs_test_classes.APRSTestClass):  # pylint: disable=R0904
             status=204
         )
 
-        aprs_conn = aprs.HTTP(
+        aprs_conn = aprsisconnect.HTTPConnection(
             user=self.fake_callsign,
             url=self.fake_server
         )
-        aprs_conn.start()
+        aprs_conn.connect()
 
-        frame = aprs.parse_frame(
+        frame = aprsisconnect.parse_frame(
             '>'.join([
                 self.fake_callsign,
                 'APRS,TCPIP*:=3745.00N/12227.00W-test_fake_good_auth'
@@ -61,11 +61,11 @@ class APRSTest(aprs_test_classes.APRSTestClass):  # pylint: disable=R0904
             status=401
         )
 
-        aprs_conn = aprs.HTTP(
+        aprs_conn = aprsisconnect.HTTPConnection(
             user=self.fake_callsign,
             url=self.fake_server
         )
-        aprs_conn.start()
+        aprs_conn.connect()
 
         msg = '>'.join([
             self.fake_callsign,
@@ -82,11 +82,11 @@ class APRSTest(aprs_test_classes.APRSTestClass):  # pylint: disable=R0904
         """
         Tests APRS-IS binding against a real APRS-IS server.
         """
-        aprs_conn = aprs.HTTP(
+        aprs_conn = aprsisconnect.HTTPConnection(
             user=self.real_callsign,
             url=self.real_server
         )
-        aprs_conn.start()
+        aprs_conn.connect()
 
         msg = '>'.join([
             self.real_callsign,

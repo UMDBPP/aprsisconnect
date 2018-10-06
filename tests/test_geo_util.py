@@ -45,7 +45,7 @@ dddmm.hhW (i.e. degrees, minutes and hundredths of a minute west).
 
 import unittest  # pylint: disable=R0801
 
-from .context import aprs  # pylint: disable=R0801
+from .context import aprsisconnect  # pylint: disable=R0801
 from .context import aprs_test_classes  # pylint: disable=R0801
 
 from . import constants  # pylint: disable=R0801
@@ -62,7 +62,7 @@ class APRSGeoTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable=
     def test_latitude_north(self):
         """Test Decimal to APRS Latitude conversion."""
         test_lat = 37.7418096
-        aprs_lat = aprs.geo_util.dec2dm_lat(test_lat)
+        aprs_lat = aprsisconnect.geo_util.dec2dm_lat(test_lat)
         self._logger.info('test_lat=%s aprs_lat=%s', test_lat, aprs_lat)
 
         lat_deg = int(aprs_lat.split('.')[0][:1])
@@ -76,7 +76,7 @@ class APRSGeoTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable=
     def test_latitude_south(self):
         """Test Decimal to APRS Latitude conversion."""
         test_lat = -37.7418096
-        aprs_lat = aprs.geo_util.dec2dm_lat(test_lat)
+        aprs_lat = aprsisconnect.geo_util.dec2dm_lat(test_lat)
         self._logger.info('test_lat=%s aprs_lat=%s', test_lat, aprs_lat)
 
         lat_deg = int(aprs_lat.split('.')[0][:1])
@@ -94,7 +94,7 @@ class APRSGeoTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable=
             - whole degrees latitude < 10
         """
         test_lat = -38.01
-        aprs_lat = aprs.geo_util.dec2dm_lat(test_lat)
+        aprs_lat = aprsisconnect.geo_util.dec2dm_lat(test_lat)
         self._logger.info('test_lat=%s aprs_lat=%s', test_lat, aprs_lat)
 
         lat_deg = int(aprs_lat.split('.')[0][:1])
@@ -112,7 +112,7 @@ class APRSGeoTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable=
             - whole degrees latitude < 10
         """
         test_lat = -8.01
-        aprs_lat = aprs.geo_util.dec2dm_lat(test_lat)
+        aprs_lat = aprsisconnect.geo_util.dec2dm_lat(test_lat)
         self._logger.info('test_lat=%s aprs_lat=%s', test_lat, aprs_lat)
 
         lat_deg = int(aprs_lat.split('.')[0][:1])
@@ -125,7 +125,7 @@ class APRSGeoTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable=
     def test_longitude_west(self):
         """Test Decimal to APRS Longitude conversion."""
         test_lng = -122.38833
-        aprs_lng = aprs.geo_util.dec2dm_lng(test_lng)
+        aprs_lng = aprsisconnect.geo_util.dec2dm_lng(test_lng)
         self._logger.info('test_lng=%s aprs_lng=%s', test_lng, aprs_lng)
 
         lng_deg = int(aprs_lng.split('.')[0][:2])
@@ -144,7 +144,7 @@ class APRSGeoTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable=
             - whole degrees longitude < 100
         """
         test_lng = -122.01
-        aprs_lng = aprs.geo_util.dec2dm_lng(test_lng)
+        aprs_lng = aprsisconnect.geo_util.dec2dm_lng(test_lng)
         self._logger.info('test_lng=%s aprs_lng=%s', test_lng, aprs_lng)
 
         lng_deg = int(aprs_lng.split('.')[0][:2])
@@ -163,7 +163,7 @@ class APRSGeoTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable=
             - whole degrees longitude < 100
         """
         test_lng = -99.01
-        aprs_lng = aprs.geo_util.dec2dm_lng(test_lng)
+        aprs_lng = aprsisconnect.geo_util.dec2dm_lng(test_lng)
         self._logger.info('test_lng=%s aprs_lng=%s', test_lng, aprs_lng)
 
         lng_deg = int(aprs_lng.split('.')[0][:2])
@@ -177,7 +177,7 @@ class APRSGeoTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable=
     def test_longitude_east(self):
         """Test Decimal to APRS Longitude conversion."""
         test_lng = 122.38833
-        aprs_lng = aprs.geo_util.dec2dm_lng(test_lng)
+        aprs_lng = aprsisconnect.geo_util.dec2dm_lng(test_lng)
         self._logger.info('test_lng=%s aprs_lng=%s', test_lng, aprs_lng)
 
         lng_deg = int(aprs_lng.split('.')[0][:2])

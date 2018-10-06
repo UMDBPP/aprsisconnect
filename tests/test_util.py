@@ -5,7 +5,7 @@
 
 import unittest  # pylint: disable=R0801
 
-from .context import aprs  # pylint: disable=R0801
+from .context import aprsisconnect  # pylint: disable=R0801
 from .context import aprs_test_classes  # pylint: disable=R0801
 
 from . import constants  # pylint: disable=R0801
@@ -21,19 +21,19 @@ class APRSUtilTestCase(aprs_test_classes.APRSTestClass):  # NOQA pylint: disable
 
     def test_valid_callsign_valid(self):
         """
-        Tests valid callsigns using `aprs.valid_callsign()`.
+        Tests valid callsigns using `aprsisconnect.valid_callsign()`.
         """
         for i in constants.VALID_CALLSIGNS:
             self.assertTrue(
-                aprs.valid_callsign(i), "%s is a valid call" % i)
+                aprsisconnect.valid_callsign(i), "%s is a valid call" % i)
 
     def test_valid_callsign_invalid(self):
         """
-        Tests invalid callsigns using `aprs.valid_callsign()`.
+        Tests invalid callsigns using `aprsisconnect.valid_callsign()`.
         """
         for i in constants.INVALID_CALLSIGNS:
             self.assertFalse(
-                aprs.valid_callsign(i), "%s is an invalid call" % i)
+                aprsisconnect.valid_callsign(i), "%s is an invalid call" % i)
 
 
 if __name__ == '__main__':

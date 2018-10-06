@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """
-Setup for the Python APRS Module.
+Setup for the Python aprsisconnect module.
+Forked from the APRS module v. 7.0.0 by Greg Albrecht.
 
+:author: Luke Renegar KM4LKM <luke.renegar@gmail.com>
 :author: Greg Albrecht W2GMD <oss@undef.net>
-:copyright: Copyright 2017 Greg Albrecht and Contributors
+:copyright: Copyright 2018 Luke Renegar, Greg Albrecht, and Contributors
 :license: Apache License, Version 2.0
-:source: <https://github.com/ampledata/aprs>
+:source: <https://github.com/UMDBPP/aprsisconnect>
 """
 
 import os
@@ -15,10 +17,10 @@ import sys
 
 import setuptools
 
-__title__ = 'aprs'
-__version__ = '7.0.0'
-__author__ = 'Greg Albrecht W2GMD <oss@undef.net>'  # NOQA pylint: disable=R0801
-__copyright__ = 'Copyright 2017 Greg Albrecht and Contributors'  # NOQA pylint: disable=R0801
+__title__ = 'aprsisconnect'
+__version__ = '8.0.0'
+__author__ = 'Luke Renegar KM4LKM <luke.renegar@gmail.com>'  # NOQA pylint: disable=R0801
+__copyright__ = 'Copyright 2018 Luke Renegar, Greg Albrecht, and Contributors'  # NOQA pylint: disable=R0801
 __license__ = 'Apache License, Version 2.0'  # NOQA pylint: disable=R0801
 
 
@@ -37,14 +39,14 @@ setuptools.setup(
     name=__title__,
     version=__version__,
     description='Python APRS Module.',
-    author='Greg Albrecht',
-    author_email='oss@undef.net',
-    packages=['aprs'],
+    author='Luke Renegar',
+    author_email='luke.renegar@gmail.com',
+    packages=['aprsisconnect'],
     package_data={'': ['LICENSE']},
-    package_dir={'aprs': 'aprs'},
+    package_dir={'aprsisconnect': 'aprsisconnect'},
     license=open('LICENSE').read(),
     long_description=open('README.rst').read(),
-    url='https://github.com/ampledata/aprs',
+    url='https://github.com/UMDBPP/aprsisconnect',
     zip_safe=False,
     include_package_data=True,
     tests_require=[

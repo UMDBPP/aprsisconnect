@@ -33,7 +33,7 @@ from .fcs import FCS  # NOQA
 from .functions import (parse_frame, parse_callsign,   # NOQA
                         parse_callsign_ax25, parse_info_field)
 
-from .classes import (Frame, Callsign, APRS, TCP, UDP, HTTP,  # NOQA
+from .classes import (Frame, Callsign, APRSISConnection, TCPConnection, UDPConnection, HTTPConnection,  # NOQA
                       InformationField, PositionFrame)
 
 __author__ = 'Greg Albrecht W2GMD <oss@undef.net>'  # NOQA pylint: disable=R0801

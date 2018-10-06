@@ -45,8 +45,8 @@ Example 1 Code
 
     def p(x): print(x)
 
-    a = aprs.TCP('W2GMD', '12345')
-    a.start()
+    a = aprs.TCPConnection('W2GMD', '12345')
+    a.connect()
 
     a.receive(callback=p)
 
@@ -70,8 +70,8 @@ Example 2 Code
 
     frame = aprs.parse_frame('W2GMD>APRS:>Hello World!')
 
-    a = aprs.TCP('W2GMD', '12345')
-    a.start()
+    a = aprs.TCPConnection('W2GMD', '12345')
+    a.connect()
 
     a.send(frame)
 

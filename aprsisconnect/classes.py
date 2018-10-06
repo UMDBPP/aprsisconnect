@@ -12,7 +12,7 @@ import typing
 import pkg_resources
 import requests
 
-import aprs  # pylint: disable=R0801
+import aprsisconnect  # pylint: disable=R0801
 
 __author__ = 'Greg Albrecht W2GMD <oss@undef.net>'  # NOQA pylint: disable=R0801
 __copyright__ = 'Copyright 2017 Greg Albrecht and Contributors'  # NOQA pylint: disable=R0801
@@ -31,20 +31,20 @@ class Frame(object):
 
     _logger = logging.getLogger(__name__)  # pylint: disable=R0801
     if not _logger.handlers:  # pylint: disable=R0801
-        _logger.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
+        _logger.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
         _console_handler = logging.StreamHandler()  # pylint: disable=R0801
-        _console_handler.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
-        _console_handler.setFormatter(aprs.LOG_FORMAT)  # pylint: disable=R0801
+        _console_handler.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
+        _console_handler.setFormatter(aprsisconnect.LOG_FORMAT)  # pylint: disable=R0801
         _logger.addHandler(_console_handler)  # pylint: disable=R0801
         _logger.propagate = False  # pylint: disable=R0801
 
     def __init__(self, source: bytes=b'', destination: bytes=b'',
                  path: list=[], info: bytes=b'') -> None:
-        self.source = aprs.parse_callsign(source)
-        self.destination = aprs.parse_callsign(destination)
+        self.source = aprsisconnect.parse_callsign(source)
+        self.destination = aprsisconnect.parse_callsign(destination)
         # TODO: Add parse_path function
         self.path = path
-        self.info = aprs.parse_info_field(info)
+        self.info = aprsisconnect.parse_info_field(info)
 
     def __repr__(self) -> str:
         """
@@ -70,39 +70,39 @@ class Frame(object):
         return frame
 
     def set_source(self, source: typing.Union[str, bytes]) -> None:
-        self.source = aprs.parse_callsign(source)
+        self.source = aprsisconnect.parse_callsign(source)
 
     def set_destination(self, destination: typing.Union[str, bytes]) -> None:
-        self.destination = aprs.parse_callsign(destination)
+        self.destination = aprsisconnect.parse_callsign(destination)
 
     def set_path(self, path=[]) -> None:
-        self.path = [aprs.parse_callsign(pth) for pth in path]
+        self.path = [aprsisconnect.parse_callsign(pth) for pth in path]
 
     def update_path(self, update: bytes) -> None:
-        self.path.append(aprs.parse_callsign(update))
+        self.path.append(aprsisconnect.parse_callsign(update))
 
     def set_info(self, info: typing.Union[str, bytes]) -> None:
-        self.info = aprs.parse_info_field(info)
+        self.info = aprsisconnect.parse_info_field(info)
 
     def encode_ax25(self) -> bytes:
         """
         Encodes an APRS Frame as AX.25.
         """
         encoded_frame = []
-        encoded_frame.append(aprs.AX25_FLAG)
+        encoded_frame.append(aprsisconnect.AX25_FLAG)
         encoded_frame.append(self.destination.encode_ax25())
         encoded_frame.append(self.source.encode_ax25())
         for path_call in self.path:
             encoded_frame.append(path_call.encode_ax25())
-        encoded_frame.append(aprs.ADDR_INFO_DELIM)
+        encoded_frame.append(aprsisconnect.ADDR_INFO_DELIM)
         encoded_frame.append(bytes(self.info))
 
-        fcs = aprs.FCS()
+        fcs = aprsisconnect.FCS()
         for bit in encoded_frame:
             fcs.update_bit(bit)
 
         encoded_frame.append(fcs.digest())
-        encoded_frame.append(aprs.AX25_FLAG)
+        encoded_frame.append(aprsisconnect.AX25_FLAG)
 
         return b''.join(encoded_frame)
 
@@ -117,10 +117,10 @@ class Callsign(object):
 
     _logger = logging.getLogger(__name__)  # pylint: disable=R0801
     if not _logger.handlers:  # pylint: disable=R0801
-        _logger.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
+        _logger.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
         _console_handler = logging.StreamHandler()  # pylint: disable=R0801
-        _console_handler.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
-        _console_handler.setFormatter(aprs.LOG_FORMAT)  # pylint: disable=R0801
+        _console_handler.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
+        _console_handler.setFormatter(aprsisconnect.LOG_FORMAT)  # pylint: disable=R0801
         _logger.addHandler(_console_handler)  # pylint: disable=R0801
         _logger.propagate = False  # pylint: disable=R0801
 
@@ -209,16 +209,16 @@ class Callsign(object):
         return b''.join(encoded_callsign)
 
 
-class APRS(object):
+class APRSISConnection(object):
 
-    """APRS Object."""
+    """Abstract base class representing a connection to APRS-IS."""
 
     _logger = logging.getLogger(__name__)  # pylint: disable=R0801
     if not _logger.handlers:  # pylint: disable=R0801
-        _logger.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
+        _logger.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
         _console_handler = logging.StreamHandler()  # pylint: disable=R0801
-        _console_handler.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
-        _console_handler.setFormatter(aprs.LOG_FORMAT)  # pylint: disable=R0801
+        _console_handler.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
+        _console_handler.setFormatter(aprsisconnect.LOG_FORMAT)  # pylint: disable=R0801
         _logger.addHandler(_console_handler)  # pylint: disable=R0801
         _logger.propagate = False  # pylint: disable=R0801
 
@@ -231,7 +231,7 @@ class APRS(object):
 
         try:
             version = bytes(pkg_resources.get_distribution(  # NOQA pylint: disable=E1101
-                'aprs').version, 'UTF-8')
+                'aprsisconnect').version, 'UTF-8')
         except:  # pylint: disable=W0702
             version = b'GIT'
         version_str = b'Python APRS Module v' + version
@@ -243,9 +243,15 @@ class APRS(object):
         self.interface = None
         self.use_i_construct = False
 
-    def start(self):
+    def connect(self):
         """
         Abstract method for starting connection to APRS-IS.
+        """
+        pass
+
+    def disconnect(self):
+        """
+        Abstract method for stopping connection to APRS-IS.
         """
         pass
 
@@ -255,21 +261,21 @@ class APRS(object):
         """
         pass
 
-    def receive(self, callback=None, frame_handler=aprs.parse_frame):
+    def receive(self, callback=None, frame_handler=aprsisconnect.parse_frame):
         """
         Abstract method for receiving messages from APRS-IS.
         """
         pass
 
 
-class TCP(APRS):
+class TCPConnection(APRSISConnection):
 
     """APRS-IS TCP Class."""
 
     def __init__(self, user: bytes, password: bytes, servers: bytes=b'',
                  aprs_filter: bytes=b'') -> None:
-        super(TCP, self).__init__(user, password)
-        servers = servers or aprs.APRSIS_SERVERS  # Unicode
+        super(TCPConnection, self).__init__(user, password)
+        servers = servers or aprsisconnect.APRSIS_SERVERS  # Unicode
         aprs_filter = aprs_filter or b'/'.join([b'p', user])  # Unicode
         if isinstance(aprs_filter, str):
             aprs_filter = bytes(aprs_filter, 'UTF-8')
@@ -281,7 +287,7 @@ class TCP(APRS):
         self.use_i_construct = True
         self._connected = False
 
-    def start(self):
+    def connect(self):
         """
         Connects & logs in to APRS-IS.
         """
@@ -292,7 +298,7 @@ class TCP(APRS):
                 port = int(port)
             else:
                 server = servers
-                port = aprs.APRSIS_FILTER_PORT
+                port = aprsisconnect.APRSIS_FILTER_PORT
 
             try:
                 addr_info = socket.getaddrinfo(server, port)
@@ -344,7 +350,7 @@ class TCP(APRS):
 
         return self.interface.send(_frame)
 
-    def receive(self, callback=None, frame_handler=aprs.parse_frame):
+    def receive(self, callback=None, frame_handler=aprsisconnect.parse_frame):
         """
         Receives from APRS-IS.
 
@@ -363,7 +369,7 @@ class TCP(APRS):
 
         try:
             while 1:
-                recv_data = self.interface.recv(aprs.RECV_BUFFER)
+                recv_data = self.interface.recv(aprsisconnect.RECV_BUFFER)
 
                 if not recv_data:
                     break
@@ -402,18 +408,18 @@ class TCP(APRS):
             raise
 
 
-class UDP(APRS):
+class UDPConnection(APRSISConnection):
 
     """APRS-IS UDP Class."""
 
     def __init__(self, user, password='-1', server=None, port=None):
-        super(UDP, self).__init__(user, password)
-        server = server or aprs.APRSIS_SERVERS[0]
-        port = port or aprs.APRSIS_RX_PORT
+        super(UDPConnection, self).__init__(user, password)
+        server = server or aprsisconnect.APRSIS_SERVERS[0]
+        port = port or aprsisconnect.APRSIS_RX_PORT
         self._addr = (server, int(port))
         self.use_i_construct = True
 
-    def start(self):
+    def connect(self):
         """
         Connects & logs in to APRS-IS.
         """
@@ -431,18 +437,18 @@ class UDP(APRS):
         return self.interface.sendto(content, self._addr)
 
 
-class HTTP(APRS):
+class HTTPConnection(APRSISConnection):
 
     """APRS-IS HTTP Class."""
 
     def __init__(self, user: bytes, password: bytes=b'-1', url: bytes=b'',
                  headers=None) -> None:
-        super(HTTP, self).__init__(user, password)
-        self.url = url or aprs.APRSIS_URL
-        self.headers = headers or aprs.APRSIS_HTTP_HEADERS
+        super(HTTPConnection, self).__init__(user, password)
+        self.url = url or aprsisconnect.APRSIS_URL
+        self.headers = headers or aprsisconnect.APRSIS_HTTP_HEADERS
         self.use_i_construct = True
 
-    def start(self):
+    def connect(self):
         """
         Connects & logs in to APRS-IS.
         """
@@ -456,8 +462,8 @@ class HTTP(APRS):
         :type frame: str
         """
         if isinstance(frame, str):
-            frame = aprs.parse_frame(frame)
-        if isinstance(frame, aprs.Frame):
+            frame = aprsisconnect.parse_frame(frame)
+        if isinstance(frame, aprsisconnect.Frame):
             frame = bytes(frame)
         self._logger.info('Sending frame="%s"', frame)
         content = b"\n".join([self._auth, frame])
@@ -473,10 +479,10 @@ class InformationField(object):
 
     _logger = logging.getLogger(__name__)  # pylint: disable=R0801
     if not _logger.handlers:  # pylint: disable=R0801
-        _logger.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
+        _logger.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
         _console_handler = logging.StreamHandler()  # pylint: disable=R0801
-        _console_handler.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
-        _console_handler.setFormatter(aprs.LOG_FORMAT)  # pylint: disable=R0801
+        _console_handler.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
+        _console_handler.setFormatter(aprsisconnect.LOG_FORMAT)  # pylint: disable=R0801
         _logger.addHandler(_console_handler)  # pylint: disable=R0801
         _logger.propagate = False  # pylint: disable=R0801
 
@@ -509,10 +515,10 @@ class PositionFrame(Frame):
 
     _logger = logging.getLogger(__name__)  # pylint: disable=R0801
     if not _logger.handlers:  # pylint: disable=R0801
-        _logger.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
+        _logger.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
         _console_handler = logging.StreamHandler()  # pylint: disable=R0801
-        _console_handler.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
-        _console_handler.setFormatter(aprs.LOG_FORMAT)  # pylint: disable=R0801
+        _console_handler.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
+        _console_handler.setFormatter(aprsisconnect.LOG_FORMAT)  # pylint: disable=R0801
         _logger.addHandler(_console_handler)  # pylint: disable=R0801
         _logger.propagate = False  # pylint: disable=R0801
 
@@ -529,10 +535,10 @@ class PositionFrame(Frame):
         super(PositionFrame, self).__init__(source, destination, path, info)
 
     def create_info_field(self) -> bytes:
-        enc_lat = aprs.dec2dm_lat(self.lat)
-        enc_lat_amb = bytes(aprs.ambiguate(enc_lat, self.ambiguity), 'UTF-8')
-        enc_lng = aprs.dec2dm_lng(self.lng)
-        enc_lng_amb = bytes(aprs.ambiguate(enc_lng, self.ambiguity), 'UTF-8')
+        enc_lat = aprsisconnect.dec2dm_lat(self.lat)
+        enc_lat_amb = bytes(aprsisconnect.ambiguate(enc_lat, self.ambiguity), 'UTF-8')
+        enc_lng = aprsisconnect.dec2dm_lng(self.lng)
+        enc_lng_amb = bytes(aprsisconnect.ambiguate(enc_lng, self.ambiguity), 'UTF-8')
         frame = [
             b'=',
             enc_lat_amb,

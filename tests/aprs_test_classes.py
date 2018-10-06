@@ -7,7 +7,7 @@ import logging
 import random
 import unittest
 
-from .context import aprs
+from .context import aprsisconnect
 
 from . import constants
 
@@ -22,10 +22,10 @@ class APRSTestClass(unittest.TestCase):  # pylint: disable=R0904
 
     _logger = logging.getLogger(__name__)  # pylint: disable=R0801
     if not _logger.handlers:  # pylint: disable=R0801
-        _logger.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
+        _logger.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
         _console_handler = logging.StreamHandler()  # pylint: disable=R0801
-        _console_handler.setLevel(aprs.LOG_LEVEL)  # pylint: disable=R0801
-        _console_handler.setFormatter(aprs.LOG_FORMAT)  # pylint: disable=R0801
+        _console_handler.setLevel(aprsisconnect.LOG_LEVEL)  # pylint: disable=R0801
+        _console_handler.setFormatter(aprsisconnect.LOG_FORMAT)  # pylint: disable=R0801
         _logger.addHandler(_console_handler)  # pylint: disable=R0801
         _logger.propagate = False  # pylint: disable=R0801
 
