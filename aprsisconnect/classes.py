@@ -3,6 +3,8 @@
 
 """Python APRS Module Class Definitions."""
 
+# Modified by University of Maryland Balloon Payload Program
+
 import itertools
 import logging
 import socket

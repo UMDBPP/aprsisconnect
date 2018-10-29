@@ -36,6 +36,8 @@ import struct
 
 import bitarray
 
+# Modified by University of Maryland Balloon Payload Program
+
 __author__ = 'Christopher H. Casebeer'  # NOQA pylint: disable=R0801
 __copyright__ = 'Copyright (c) 2013 Christopher H. Casebeer. All rights reserved.'  # NOQA pylint: disable=R0801
 __license__ = 'BSD 2-clause Simplified License'  # NOQA pylint: disable=R0801

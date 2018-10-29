@@ -48,6 +48,8 @@ $ python decimaldegrees.py [-v]
 
 """
 
+# Modified by University of Maryland Balloon Payload Program
+
 import decimal as libdecimal
 
 from decimal import Decimal as D

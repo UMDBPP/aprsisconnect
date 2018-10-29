@@ -17,6 +17,8 @@ import sys
 
 import setuptools
 
+# Modified by University of Maryland Balloon Payload Program
+
 __title__ = 'aprsisconnect'
 __version__ = '8.0.0'
 __author__ = 'Luke Renegar KM4LKM <luke.renegar@gmail.com>'  # NOQA pylint: disable=R0801
