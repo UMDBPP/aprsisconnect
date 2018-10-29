@@ -8,6 +8,7 @@ import logging
 import socket
 import time
 import typing
+import threading
 
 import pkg_resources
 import requests
@@ -243,6 +244,7 @@ class APRSISConnection(object):
         self.interface = None
         self.use_i_construct = False
         self._receiving = False
+        self._receiving_lock = threading.Lock()
 
     def connect(self):
         """
@@ -372,6 +374,7 @@ class TCPConnection(APRSISConnection):
 
         return self.interface.send(_frame)
 
+
     def start_receiving(self, callback=None, frame_handler=aprsisconnect.parse_frame):
         """
         Receives from APRS-IS.
@@ -386,13 +389,15 @@ class TCPConnection(APRSISConnection):
             'Receive started with callback="%s" and frame_handler="%s"',
             callback, frame_handler)
 
+        self._receiving_lock.acquire()
+
         # Unicode Sandwich: Receive Bytes.
         recvd_data = bytes()
 
         self._receiving = True
 
         try:
-            while self._connected and self._receiving:
+            while self._connected and self._receiving:  # TODO don't hog the thread
                 recv_data = self.interface.recv(aprsisconnect.RECV_BUFFER)
 
                 if not recv_data:
@@ -430,9 +435,15 @@ class TCPConnection(APRSISConnection):
         except socket.error as sock_err:
             self._logger.exception(sock_err)
             raise
+        finally:
+            self._receiving_lock.release()
 
-    def stop_receiving(self):
-        self._receiving = False
+    def stop_receiving(self, block_until_complete: bool = True):
+        # TODO documentation
+        self._receiving = False  # Receiving will terminate on next loop iteration
+        if block_until_complete:  # Ensure the receiving has terminated
+            self._receiving_lock.acquire()
+            self._receiving_lock.release()
 
 
 class UDPConnection(APRSISConnection):
